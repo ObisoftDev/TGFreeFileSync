@@ -256,6 +256,48 @@ def onmessage(update,bot:ObigramClient):
                     index += 1
         send_root(update,bot,message,user_info,PROXY_OBJ=PROXY_OBJ)
 
+    if '/zip' in text:
+        text = str(text).replace('/zip ','')
+        index = None
+        range = None
+        sizemb = 99999
+        try:
+            index = int(str(text).split('-')[0])
+            range = index+1
+            try:
+                range = int(str(text).split(' ')[0].split('-')[1])+1
+            except:pass
+            sizemb = int(str(text).split(' ')[1])
+        except:
+            pass
+        if index != None:
+            listdir = get_root(username)
+            zipsplit = listdir[index].split('.')
+            zipname = ''
+            i=0
+            for item in zipsplit:
+                    if i>=len(zipsplit)-1:continue
+                    zipname += item
+                    i+=1
+            filezise=0
+            iindex = index
+            while iindex<range:
+                ffullpath = config.BASE_ROOT_PATH + username + '/' + listdir[index]
+                filezise+=get_file_size(ffullpath)
+                iindex+=1
+            zipname = config.BASE_ROOT_PATH + username + '/' + zipname
+            multifile = zipfile.MultiFile(zipname, 1024 * 1024 * sizemb,filezise,progressfunc=progresscompress,args=(bot,message))
+            zip = zipfile.ZipFile(multifile, mode='w', compression=zipfile.ZIP_DEFLATED)
+            while index<range:
+                ffullpath = config.BASE_ROOT_PATH + username + '/' + listdir[index]
+                message = bot.sendMessage(update.message.chat.id,f'📚Comprimiendo {listdir[index]}...')
+                filezise = get_file_size(ffullpath)
+                zip.write(ffullpath)
+                index+=1
+            zip.close()
+            multifile.close()
+            send_root(update,bot,message,user_info)
+
     if '/sync' in text:
         syncid = createID(12)
         LISTENING[syncid] = False
@@ -332,6 +374,11 @@ def onmessage(update,bot:ObigramClient):
 
                 if LISTENING[syncid] == True:
                    LISTENING.pop(syncid)
+                   icontent = 1
+                   while icontent<config.UPLOAD_SYNC:
+                       content = get_content_name(fileid,icontent)
+                       ownclient.deleteStacic(user_info['user'], user_info['password'],content,PROXY_OBJ)
+                       icontent+=1
                    break
                 sync_markup = inlineKeyboardMarkup(
                          r1=[inlineKeyboardButton(text='⬇️Enlace Sync⬇️',
@@ -386,6 +433,7 @@ def cancellisten(update,bot:ObigramClient):
         cmd = str(update.data).split(' ')
         listenid = cmd[0]
         LISTENING[listenid] = True
+        bot.editMessageText(update.message,'🛑Syncronizacion Cancelada🛑')
     except:pass
     pass
 def delete(update,bot:ObigramClient):
