@@ -302,7 +302,7 @@ def onmessage(update,bot:ObigramClient):
 
                     while content in contents:
                         contents = ownclient.getRootStacic(user_info['user'], user_info['password'], PROXY_OBJ)
-                        delcontent = str(reqname).replace('req-', f'delcontent-').replace('.txt', '.bin')
+                        delcontent = str(content).replace('content-', f'delcontent-')
                         if delcontent in contents:
                             ownclient.deleteStacic(user_info['user'], user_info['password'], delcontent,PROXY_OBJ)
                             ownclient.deleteStacic(user_info['user'], user_info['password'],content,PROXY_OBJ)
