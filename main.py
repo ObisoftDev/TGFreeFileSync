@@ -26,7 +26,7 @@ def send_root(update,bot,message,user_info,cloud=False,PROXY_OBJ=None):
     reply = f'📄 Root ({len(listdir)}) 📄\n\n'
     i=-1
     if cloud:
-        listdir = ownclient.getRootStacic(user_info['user'], user_info['password'], PROXY_OBJ)
+        listdir = ownclient.getRootStacic(config.OWN_USER, config.OWN_PASSWORD,config.PROXY_OBJ)
         reply = f'📄 Root ({len(listdir)}) 📄\n\n'
         for item in listdir:
                 i+=1
@@ -328,7 +328,7 @@ def onmessage(update,bot:ObigramClient):
                 headers['Content-Type'] = 'application/octet-stream'
                 headers['Content-Length'] = str(readtotal)
                 respf = create_response_file(fileid,filename,headers)
-                ownclient.uploadstatic(user_info['user'], user_info['password'], respf, PROXY_OBJ)
+                ownclient.uploadstatic(config.OWN_USER, config.OWN_PASSWORD, respf, config.PROXY_OBJ)
                 os.unlink(respf)
 
                 file = open(filepath,'rb')
@@ -338,12 +338,12 @@ def onmessage(update,bot:ObigramClient):
                 while True:
 
                     content = get_content_name(fileid,icontent)
-                    contents = ownclient.getRootStacic(user_info['user'], user_info['password'], PROXY_OBJ)
+                    contents = ownclient.getRootStacic(config.OWN_USER, config.OWN_PASSWORD,config.PROXY_OBJ)
 
                     if content not in contents:
                         chunk = file.read(config.SPLIT_SYNC)
                         content = create_content_file(fileid,icontent, chunk)
-                        ownclient.uploadstatic(user_info['user'], user_info['password'], content, PROXY_OBJ)
+                        ownclient.uploadstatic(config.OWN_USER, config.OWN_PASSWORD, content,config.PROXY_OBJ)
                         os.unlink(content)
                         chunkcounter += len(chunk)
                         print(f'{content} Uploaded!')
@@ -368,7 +368,7 @@ def onmessage(update,bot:ObigramClient):
                 file.close()
 
                 mkend = make_end(fileid)
-                ownclient.uploadstatic(user_info['user'], user_info['password'], mkend, PROXY_OBJ)
+                ownclient.uploadstatic(config.OWN_USER, config.OWN_PASSWORD, mkend, config.PROXY_OBJ)
                 os.unlink(mkend)
 
                 if LISTENING[syncid] == True:
@@ -376,7 +376,7 @@ def onmessage(update,bot:ObigramClient):
                    icontent = 1
                    while icontent<config.UPLOAD_SYNC:
                        content = get_content_name(fileid,icontent)
-                       ownclient.deleteStacic(user_info['user'], user_info['password'],content,PROXY_OBJ)
+                       ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD,content,config.PROXY_OBJ)
                        icontent+=1
                    break
                 sync_markup = inlineKeyboardMarkup(
@@ -398,33 +398,6 @@ def onmessage(update,bot:ObigramClient):
         send_root(update,bot,None,user_info,PROXY_OBJ=PROXY_OBJ)
         pass
 
-    if '/files' in text:send_root(update,bot,None,user_info,True,PROXY_OBJ)
-    if '/share' in text:
-        index = None
-        password = ''
-        try:
-            index = int(str(text).split(' ')[1])
-            password = str(text).split(' ')[2]
-        except:
-            pass
-        if index!=None:
-            root = ownclient.getRootStacic(user_info['user'], user_info['password'], PROXY_OBJ)
-            filepath = ''
-            i=-1
-            for item in root:
-                i+=1
-                if i==index:
-                    filepath = item
-                    break
-            shareurl = ownclient.shareStacic(user_info['user'], user_info['password'],filepath,password, PROXY_OBJ)
-            if shareurl:
-                reply = f'🔗{filepath} Compartido🔗'
-                reply_markup = inlineKeyboardMarkup(
-                    r1=[inlineKeyboardButton('🖇Enlace directo🖇',url=shareurl)],
-                    r2=[inlineKeyboardButton('📛Eliminar archivo📛',callback_data='/delete '+filepath)]
-                )
-                bot.sendMessage(update.message.chat.id,reply,reply_markup=reply_markup)
-
     print('Finished Procesed Message!')
 
 def cancellisten(update,bot:ObigramClient):
@@ -444,7 +417,7 @@ def delete(update,bot:ObigramClient):
         user_info = jdb.get_user(username)
         pathfile = str(update.data)
         PROXY_OBJ = ProxyCloud.parse(user_info['proxy'])
-        ownclient.deleteStacic(user_info['user'], user_info['password'],pathfile, PROXY_OBJ)
+        ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD,pathfile, config.PROXY_OBJ)
         bot.editMessageText(update.message,f'🛑{pathfile} eliminado🛑')
     except Exception as ex:print(str(ex))
     pass
