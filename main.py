@@ -170,61 +170,6 @@ def onmessage(update,bot:ObigramClient):
     PROXY_OBJ = ProxyCloud.parse(user_info['proxy'])
 
     # comandos de admin
-    if '/adduser' in text:
-            isadmin = jdb.is_admin(username)
-            if isadmin:
-                try:
-                    user = str(text).split(' ')[1]
-                    jdb.create_user(user)
-                    jdb.save()
-                    msg = '😃Genial @' + user + ' ahora tiene acceso al bot👍'
-                    bot.sendMessage(update.message.chat.id, msg)
-                except:
-                    bot.sendMessage(update.message.chat.id, '❌Error en el comando /adduser username❌')
-            else:
-                bot.sendMessage(update.message.chat.id, '❌No tiene permiso❌')
-            return
-    if '/account' in text:
-        try:
-            account = str(text).split(' ', 2)[1].split(',')
-            user = account[0]
-            passw = account[1]
-            if user_info:
-                user_info['user'] = user
-                user_info['password'] = passw
-                jdb.save_data_user(username, user_info)
-                jdb.save()
-                statInfo = infos.createStat(username, user_info, jdb.is_admin(username))
-                bot.sendMessage(update.message.chat.id, statInfo)
-        except:
-            statInfo = infos.createStat(username, user_info, jdb.is_admin(username))
-            bot.sendMessage(update.message.chat.id, statInfo)
-        return
-    if '/proxy' in text:
-        try:
-            account = str(text).split(' ', 2)[1].split(',')
-            proxy = account[0]
-            if user_info:
-                user_info['proxy'] = proxy
-                jdb.save_data_user(username, user_info)
-                jdb.save()
-                statInfo = infos.createStat(username, user_info, jdb.is_admin(username))
-                bot.sendMessage(update.message.chat.id, statInfo)
-        except:
-            bot.sendMessage(update.message.chat.id, '❌Error en el comando /proxy proxy_enc❌')
-        return
-
-
-    if '/setenv' in text:
-        key = None
-        value = None
-        try:
-            key = str(text).split(' ')[1]
-            value = str(text).split(' ')[2]
-            os.environ[key] = value
-            bot.sendMessage(update.message.chat.id, '✅Variable de entorno seteada✅')
-        except Exception as ex:
-            pass
 
     if '/start' in text:
         reply = '👋TGFreeFileSync👋\nEs un bot para descargar archivos gratis sincronizados'
@@ -299,10 +244,17 @@ def onmessage(update,bot:ObigramClient):
             send_root(update,bot,message,user_info)
 
     if '/sync' in text:
-        syncid = createID(12)
-        LISTENING[syncid] = False
+        try:
+            if LISTENING[username]:pass
+        except:LISTENING[username]==True
         listenmarkup = inlineKeyboardMarkup(
-            r1=[inlineKeyboardButton(text='💢Cancelar Tarea💢',callback_data='/cancel '+syncid)])
+            r1=[inlineKeyboardButton(text='💢Cancelar Sync💢',callback_data='/cancel '+username)])
+        if LISTENING[username]==False:
+            message = bot.sendMessage(update.message.chat.id,
+                                     f'‼️Solo se permite una sync‼\n‼️debe cancelar la anterior‼️',
+                                     reply_markup=listenmarkup)
+            return
+        LISTENING[username]==False
         index = 0
         range = index+1
         try:
@@ -315,7 +267,7 @@ def onmessage(update,bot:ObigramClient):
             message = bot.sendMessage(update.message.chat.id, f'🧩Preparando Sync...',reply_markup=listenmarkup)
             lastfile = ''
             listdir = get_root(username)
-            while index < range and LISTENING[syncid] == False:
+            while index < range and LISTENING[username] == False:
                 fileid = createID(12)
                 filepath = config.BASE_ROOT_PATH + username + '/' + listdir[index]
                 filename = listdir[index]
@@ -348,12 +300,12 @@ def onmessage(update,bot:ObigramClient):
                         chunkcounter += len(chunk)
                         print(f'{content} Uploaded!')
                     
-                   #delcontent = str(content).replace('content-', f'delcontent-')
-                   #if delcontent in contents:
-                   #   ownclient.deleteStacic(user_info['user'], user_info['password'], delcontent,PROXY_OBJ)
-                   #   ownclient.deleteStacic(user_info['user'], user_info['password'],content,PROXY_OBJ)
+                    delcontent = str(content).replace('content-', f'delcontent-')
+                    if delcontent in contents:
+                       ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD, delcontent,config.PROXY_OBJ)
+                       ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD,content,config.PROXY_OBJ)
 
-                    if LISTENING[syncid] == True:break
+                    if LISTENING[username] == True:break
                     icontent += 1
                     if icontent >= config.UPLOAD_SYNC: icontent = 1
                     if showsyncurl:
@@ -361,7 +313,7 @@ def onmessage(update,bot:ObigramClient):
                         sync_markup = inlineKeyboardMarkup(
                          r1=[inlineKeyboardButton(text='⬇️Enlace Sync⬇️',
                                                   url=f'http://127.0.0.1:80/download?id={fileid}')],
-                         r2=[inlineKeyboardButton(text='💢Cancelar Tarea💢',callback_data='/cancel '+syncid)])
+                         r2=[inlineKeyboardButton(text='💢Cancelar Sync💢',callback_data='/cancel '+syncid)])
                         bot.editMessageText(message, f'🧩Sync For '+filename,reply_markup=sync_markup)
                     if chunkcounter>=readtotal:break
 
@@ -371,8 +323,8 @@ def onmessage(update,bot:ObigramClient):
                 ownclient.uploadstatic(config.OWN_USER, config.OWN_PASSWORD, mkend, config.PROXY_OBJ)
                 os.unlink(mkend)
 
-                if LISTENING[syncid] == True:
-                   LISTENING.pop(syncid)
+                if LISTENING[username] == True:
+                   LISTENING.pop(username)
                    icontent = 1
                    while icontent<config.UPLOAD_SYNC:
                        content = get_content_name(fileid,icontent)
@@ -382,7 +334,7 @@ def onmessage(update,bot:ObigramClient):
                 sync_markup = inlineKeyboardMarkup(
                          r1=[inlineKeyboardButton(text='⬇️Enlace Sync⬇️',
                                                   url=f'http://127.0.0.1:80/download?id={fileid}')],
-                         r2=[inlineKeyboardButton(text='💢Cancelar Tarea💢',callback_data='/cancel '+syncid)])
+                         r2=[inlineKeyboardButton(text='☑️Terminar Syn☑️',callback_data='/cancel '+syncid)])
                 bot.editMessageText(message, f'☑️Sync '+filename,reply_markup=sync_markup)
                 index+=1
 
@@ -403,8 +355,8 @@ def onmessage(update,bot:ObigramClient):
 def cancellisten(update,bot:ObigramClient):
     try:
         cmd = str(update.data).split(' ')
-        listenid = cmd[0]
-        LISTENING[listenid] = True
+        username = cmd[0]
+        LISTENING[username] = True
         bot.editMessageText(update.message,'🛑Syncronizacion Cancelada🛑')
     except:pass
     pass
