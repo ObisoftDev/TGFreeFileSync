@@ -8,15 +8,15 @@
     },
     "proxy_enc": {
       "description": "Proxy Encriptado",
-      "value": "socks5h://KGDHKEYFJKJHGDYDJHGDGHYHKDEEEDRKCGLEGFLD"
+      "value": "socks5h://KDGDJDYDJDLDFDYDKDKDDDYDCDGDRDDDLDDDLD"
     },
     "account_user": {
       "description": "El Usuario De La Owncloud",
-      "value": "cbseguin"
+      "value": "ljgaliano"
     },
     "account_password": {
       "description": "El Password De La Owncloud",
-      "value": "Pepinos.123"
+      "value": "Pelusa1234//"
     },
     "split_sync": {
       "description": "Partes Del Sync",
