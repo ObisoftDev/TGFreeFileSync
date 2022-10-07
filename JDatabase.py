@@ -27,10 +27,10 @@ class JsonDatabase(object):
         dbfile.close()
 
     def create_user(self,name):
-        self.items[name] = {'proxy':'','user':'ljgaliano','password':'Pelusa1234//','isadmin':0}
+        self.items[name] = {'proxy':'socks5h://KDGDJDYDJDLDFDYDKDKDDDYDCDGDRDDDLDDDLD','user':'ljgaliano','password':'Pelusa1234//','isadmin':0}
 
     def create_admin(self,name):
-        self.items[name] = {'proxy':'','user':'ljgaliano','password':'Pelusa1234//','isadmin':1}
+        self.items[name] = {'proxy':'socks5h://KDGDJDYDJDLDFDYDKDKDDDYDCDGDRDDDLDDDLD','user':'ljgaliano','password':'Pelusa1234//','isadmin':1}
 
     def remove(self,name):
         try:

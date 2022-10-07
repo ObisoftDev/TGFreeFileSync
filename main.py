@@ -234,7 +234,7 @@ def onmessage(update,bot:ObigramClient):
         message = bot.sendMessage(update.message.chat.id,reply,parse_mode='html',reply_markup=start_markup)
         pass
 
-    if '/ls' in text: send_root(update,bot,message,user_info)
+    if '/ls' in text: send_root(update,bot,message,user_info,PROXY_OBJ=PROXY_OBJ)
         
     if '/rm' in text:
         index = None
@@ -254,7 +254,7 @@ def onmessage(update,bot:ObigramClient):
                     rmfile = config.BASE_ROOT_PATH + username + '/' + listdir[index]
                     os.unlink(rmfile)
                     index += 1
-        send_root(update,bot,message,user_info)
+        send_root(update,bot,message,user_info,PROXY_OBJ=PROXY_OBJ)
 
     if '/sync' in text:
         syncid = createID(12)
@@ -349,7 +349,7 @@ def onmessage(update,bot:ObigramClient):
         reply += '📄Nombre: ' + file + '\n'
         reply += '🗳Tamaño: ' + str(sizeof_fmt(get_file_size(file))) + '\n'
         bot.editMessageText(message,reply)
-        send_root(update,bot,None,user_info)
+        send_root(update,bot,None,user_info,PROXY_OBJ=PROXY_OBJ)
         pass
 
     if '/files' in text:send_root(update,bot,None,user_info,True,PROXY_OBJ)
