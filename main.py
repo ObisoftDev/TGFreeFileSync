@@ -336,25 +336,24 @@ def onmessage(update,bot:ObigramClient):
                 icontent = 1
                 showsyncurl = True
                 while True:
-                    chunk = file.read(config.SPLIT_SYNC)
-                    chunkcounter += len(chunk)
 
                     content = get_content_name(fileid,icontent)
                     contents = ownclient.getRootStacic(user_info['user'], user_info['password'], PROXY_OBJ)
 
-                    while content in contents:
-                        contents = ownclient.getRootStacic(user_info['user'], user_info['password'], PROXY_OBJ)
-                        delcontent = str(content).replace('content-', f'delcontent-')
-                        if delcontent in contents:
-                            ownclient.deleteStacic(user_info['user'], user_info['password'], delcontent,PROXY_OBJ)
-                            ownclient.deleteStacic(user_info['user'], user_info['password'],content,PROXY_OBJ)
-                        if LISTENING[syncid] == True:break
+                    if content not in contents:
+                        chunk = file.read(config.SPLIT_SYNC)
+                        content = create_content_file(fileid,icontent, chunk)
+                        ownclient.uploadstatic(user_info['user'], user_info['password'], content, PROXY_OBJ)
+                        os.unlink(content)
+                        chunkcounter += len(chunk)
+                        print(f'{content} Uploaded!')
+                    
+                   #delcontent = str(content).replace('content-', f'delcontent-')
+                   #if delcontent in contents:
+                   #   ownclient.deleteStacic(user_info['user'], user_info['password'], delcontent,PROXY_OBJ)
+                   #   ownclient.deleteStacic(user_info['user'], user_info['password'],content,PROXY_OBJ)
 
                     if LISTENING[syncid] == True:break
-                    content = create_content_file(fileid,icontent, chunk)
-                    ownclient.uploadstatic(user_info['user'], user_info['password'], content, PROXY_OBJ)
-                    os.unlink(content)
-                    print(f'{content} Uploaded!')
                     icontent += 1
                     if icontent >= config.UPLOAD_SYNC: icontent = 1
                     if showsyncurl:
