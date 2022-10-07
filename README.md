@@ -17,7 +17,8 @@ git push heroku master
 ```/start : Inicar Bot , Te Da La info
 /ls : obtiene los archivos del root
 /rm : remueve un archivo del root (index,range)
-/sync : sube uno o varios archivos espera a q se borre el anterior de la nube (index,range)
+/sync : comienza a sincronizar archivos desde el bot a freejdl (index,range)
+/zip : comprime 1 o varios archivos en partes zip (index,range zipsize)
 ```
 
 # Deploy Directo (Heroku)
