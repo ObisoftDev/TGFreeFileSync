@@ -302,10 +302,10 @@ def onmessage(update,bot:ObigramClient):
                         chunkcounter += len(chunk)
                         print(f'{content} Uploaded!')
                     
-                    delcontent = str(content).replace('content-', f'delcontent-')
-                    if delcontent in contents:
-                       ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD, delcontent,config.PROXY_OBJ)
-                       ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD,content,config.PROXY_OBJ)
+                    #delcontent = str(content).replace('content-', f'delcontent-')
+                    #if delcontent in contents:
+                    #   ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD, delcontent,config.PROXY_OBJ)
+                    #   ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD,content,config.PROXY_OBJ)
 
                     if LISTENING[username] == True:break
                     icontent += 1
