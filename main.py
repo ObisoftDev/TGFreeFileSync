@@ -254,7 +254,7 @@ def onmessage(update,bot:ObigramClient):
                                      f'‼️Solo se permite una sync‼\n‼️debe cancelar la anterior‼️',
                                      reply_markup=listenmarkup)
             return
-        LISTENING[username]==False
+        LISTENING[username]=False
         index = 0
         range = index+1
         try:
