@@ -179,7 +179,7 @@ def onmessage(update,bot:ObigramClient):
         message = bot.sendMessage(update.message.chat.id,reply,parse_mode='html',reply_markup=start_markup)
         pass
 
-    if '/ls' in text: send_root(update,bot,message,user_info,PROXY_OBJ=PROXY_OBJ)
+    if '/ls' in text: send_root(update,bot,message,user_info,PROXY_OBJ=config.PROXY_OBJ)
         
     if '/rm' in text:
         index = None
@@ -199,7 +199,7 @@ def onmessage(update,bot:ObigramClient):
                     rmfile = config.BASE_ROOT_PATH + username + '/' + listdir[index]
                     os.unlink(rmfile)
                     index += 1
-        send_root(update,bot,message,user_info,PROXY_OBJ=PROXY_OBJ)
+        send_root(update,bot,message,user_info,PROXY_OBJ=config.PROXY_OBJ)
 
     if '/zip' in text:
         text = str(text).replace('/zip ','')
@@ -272,6 +272,8 @@ def onmessage(update,bot:ObigramClient):
                 filepath = config.BASE_ROOT_PATH + username + '/' + listdir[index]
                 filename = listdir[index]
                 readtotal = get_file_size(filepath)
+                listenmarkup = inlineKeyboardMarkup(
+                r1=[inlineKeyboardButton(text='💢Cancelar Sync💢',callback_data='/cancel '+username+' '+fileid)])
                 bot.editMessageText(message, f'🧩Sync For '+filename,reply_markup=listenmarkup)
                
                 #resp file
@@ -313,7 +315,7 @@ def onmessage(update,bot:ObigramClient):
                         sync_markup = inlineKeyboardMarkup(
                          r1=[inlineKeyboardButton(text='⬇️Enlace Sync⬇️',
                                                   url=f'http://127.0.0.1:80/download?id={fileid}')],
-                         r2=[inlineKeyboardButton(text='💢Cancelar Sync💢',callback_data='/cancel '+username)])
+                         r2=[inlineKeyboardButton(text='💢Cancelar Sync💢',callback_data='/cancel '+username+' '+fileid)])
                         bot.editMessageText(message, f'🧩Sync For '+filename,reply_markup=sync_markup)
                     if chunkcounter>=readtotal:break
 
@@ -334,7 +336,7 @@ def onmessage(update,bot:ObigramClient):
                 sync_markup = inlineKeyboardMarkup(
                          r1=[inlineKeyboardButton(text='⬇️Enlace Sync⬇️',
                                                   url=f'http://127.0.0.1:80/download?id={fileid}')],
-                         r2=[inlineKeyboardButton(text='☑️Terminar Syn☑️',callback_data='/cancel '+username)])
+                         r2=[inlineKeyboardButton(text='☑️Terminar Syn☑️',callback_data='/cancel '+username+' '+fileid)])
                 bot.editMessageText(message, f'☑️Sync '+filename,reply_markup=sync_markup)
                 index+=1
 
@@ -347,7 +349,7 @@ def onmessage(update,bot:ObigramClient):
         reply += '📄Nombre: ' + file + '\n'
         reply += '🗳Tamaño: ' + str(sizeof_fmt(get_file_size(file))) + '\n'
         bot.editMessageText(message,reply)
-        send_root(update,bot,None,user_info,PROXY_OBJ=PROXY_OBJ)
+        send_root(update,bot,None,user_info,PROXY_OBJ=config.PROXY_OBJ)
         pass
 
     print('Finished Procesed Message!')
@@ -356,7 +358,17 @@ def cancellisten(update,bot:ObigramClient):
     try:
         cmd = str(update.data).split(' ')
         username = cmd[0]
+        fileid = None
+        if len(cmd)>1:
+            fileid = cmd[1]
         LISTENING[username] = True
+        icontent=1
+        if fileid:
+            while icontent<config.UPLOAD_SYNC:
+                  content = get_content_name(fileid,icontent)
+                  ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD,content,config.PROXY_OBJ)
+                  icontent+=1
+                  break
         bot.editMessageText(update.message,'🛑Syncronizacion Cancelada🛑')
     except:pass
     pass
