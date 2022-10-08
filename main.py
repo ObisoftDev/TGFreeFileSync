@@ -246,7 +246,7 @@ def onmessage(update,bot:ObigramClient):
     if '/sync' in text:
         try:
             if LISTENING[username]:pass
-        except:LISTENING[username]==True
+        except:LISTENING[username]=True
         listenmarkup = inlineKeyboardMarkup(
             r1=[inlineKeyboardButton(text='💢Cancelar Sync💢',callback_data='/cancel '+username)])
         if LISTENING[username]==False:
