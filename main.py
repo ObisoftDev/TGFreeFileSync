@@ -367,8 +367,13 @@ def cancellisten(update,bot:ObigramClient):
             while icontent<config.UPLOAD_SYNC:
                   content = get_content_name(fileid,icontent)
                   ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD,content,config.PROXY_OBJ)
+                  ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD,f'delcontent-{icontent}{fileid}.bin',config.PROXY_OBJ)
                   icontent+=1
                   break
+        ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD,f'endcontent-{fileid}.txt',config.PROXY_OBJ)
+        ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD,f'reqcontent-{fileid}.bin',config.PROXY_OBJ)
+        ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD,f'resp-{fileid}.bin',config.PROXY_OBJ)
+        ownclient.deleteStacic(config.OWN_USER, config.OWN_PASSWORD,f'req-{fileid}.bin',config.PROXY_OBJ)
         bot.editMessageText(update.message,'🛑Syncronizacion Cancelada🛑')
     except:pass
     pass
