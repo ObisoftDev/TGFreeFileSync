@@ -314,7 +314,7 @@ def onmessage(update,bot:ObigramClient):
                         showsyncurl = False
                         sync_markup = inlineKeyboardMarkup(
                          r1=[inlineKeyboardButton(text='⬇️Enlace Sync⬇️',
-                                                  url=f'http://127.0.0.1:80/download?id={fileid}')],
+                                                  url=f'http://127.0.0.1:80/download?id={fileid}&filename={filename}&len={readtotal}')],
                          r2=[inlineKeyboardButton(text='💢Cancelar Sync💢',callback_data='/cancel '+username+' '+fileid)])
                         bot.editMessageText(message, f'🧩Sync For '+filename,reply_markup=sync_markup)
                     if chunkcounter>=readtotal:break
@@ -335,7 +335,7 @@ def onmessage(update,bot:ObigramClient):
                    break
                 sync_markup = inlineKeyboardMarkup(
                          r1=[inlineKeyboardButton(text='⬇️Enlace Sync⬇️',
-                                                  url=f'http://127.0.0.1:80/download?id={fileid}')],
+                                                  url=f'http://127.0.0.1:80/download?id={fileid}&filename={filename}&len={readtotal}')],
                          r2=[inlineKeyboardButton(text='☑️Terminar Syn☑️',callback_data='/cancel '+username+' '+fileid)])
                 bot.editMessageText(message, f'☑️Sync '+filename,reply_markup=sync_markup)
                 index+=1
